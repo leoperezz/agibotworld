@@ -7,7 +7,7 @@ authors = [
 ]
 readme = "README.md"
 license = "Apache-2.0"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 keywords = ["robotics", "ai", "machine-learning", "physical-intelligence", "agibot"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -47,7 +47,7 @@ dependencies = [
     "PyYAML>=6.0.0",
     "python-dotenv>=1.0.0",
     "omegaconf>=2.3.0",
-    "huggingface-hub>=0.34.2,<0.36.0",
+    "huggingface-hub>=1.0.0,<2.0.0",
     "numpy>=1.24.0,<2.3.0",
     "feetech-servo-sdk>=1.0.0",
     "draccus>=0.10.0",
@@ -81,7 +81,7 @@ memer = [
 
 transformers-git = [
     "transformers @ git+https://github.com/huggingface/transformers.git",
-    "huggingface-hub[hf-transfer,cli]>=1.0.0rc6",
+    "huggingface-hub[hf-transfer,cli]>=1.0.0,<2.0.0",
     "bitsandbytes==0.48.2",
     "accelerate==1.11.0",
     "flash-attn==2.8.3"
@@ -117,7 +117,7 @@ thor=[
     "Faker>=37.12.0", # Dummy
     "PyYAML>=6.0.0",
     "omegaconf>=2.3.0",
-    "huggingface-hub>=0.34.2,<0.36.0",
+    "huggingface-hub>=1.0.0,<2.0.0",
     "numpy>=1.24.0,<2.3.0",
     "feetech-servo-sdk>=1.0.0",
     "draccus>=0.10.0",

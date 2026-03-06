@@ -15,17 +15,19 @@ This repository contains code and utilities for the **AgiBot Challenge ICRA 2026
 
 #### 1.1. Create a Python environment
 
+This project currently targets **Python 3.12**.
+
 You can use either `conda` or `venv`. Below is an example using `conda`:
 
 ```bash
-conda create -n agibot-icra2026 python=3.11 -y
+conda create -n agibot-icra2026 python=3.12 -y
 conda activate agibot-icra2026
 ```
 
 If you prefer `venv`:
 
 ```bash
-python3.11 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 ```
 
