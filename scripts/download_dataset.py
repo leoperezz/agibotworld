@@ -1,9 +1,11 @@
 import argparse
 import os
 import shutil
+import sys
 from pathlib import Path
 
 from agibot.constants import DATA_DIR
+from agibot.logger import logger
 from huggingface_hub import snapshot_download
 
 
@@ -67,6 +69,10 @@ def main() -> None:
     args = parse_args()
 
     token = args.hf_token or os.environ.get("HF_TOKEN")
+    if token:
+        logger.info("Hugging Face token: provided (hf-token or HF_TOKEN env var)")
+    else:
+        logger.info("Hugging Face token: not provided (will use cached login if available)")
 
     allow_patterns = None
     subdir = None
@@ -74,6 +80,9 @@ def main() -> None:
         # Full path inside the HF repo, e.g. "Reasoning2Action-Sim/take_wrong_item_shelf"
         subdir = args.subdir.strip("/ ")
         allow_patterns = [f"{subdir}/**"]
+        logger.info(f"Downloading subdir: {subdir}")
+    else:
+        logger.warning("No --subdir provided; eligible to download the full dataset snapshot.")
 
     # Local target path where we want the *contents* to live:
     # data/challenge/<last_component_of_subdir>, e.g. data/challenge/take_wrong_item_shelf
@@ -85,15 +94,18 @@ def main() -> None:
         target_dir = Path(DATA_DIR)
 
     target_dir.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Target directory: {target_dir.resolve()}")
 
     # Download into a temporary directory under DATA_DIR to preserve the HF structure,
     # then move the contents of the requested subdir into target_dir so we don't keep
     # nested "Reasoning2Action-Sim/take_wrong_item_shelf" folders.
     tmp_dir = Path(DATA_DIR) / "_tmp_download"
     if tmp_dir.exists():
+        logger.warning(f"Removing existing temp directory: {tmp_dir}")
         shutil.rmtree(tmp_dir)
     tmp_dir.mkdir(parents=True, exist_ok=True)
 
+    logger.info(f"Starting snapshot_download(repo_id={args.repo_id})")
     snapshot_download(
         repo_id=args.repo_id,
         repo_type="dataset",
@@ -102,6 +114,7 @@ def main() -> None:
         allow_patterns=allow_patterns,
         token=token,
     )
+    logger.info("Download finished, moving files into target directory.")
 
     if subdir:
         downloaded_subdir = tmp_dir / subdir
@@ -114,6 +127,8 @@ def main() -> None:
                     shutil.move(str(item), str(dest))
                 else:
                     shutil.move(str(item), str(dest))
+        else:
+            logger.error(f"Expected downloaded subdir not found: {downloaded_subdir}")
     else:
         # If no specific subdir, move everything one level up into target_dir
         for item in tmp_dir.iterdir():
@@ -126,8 +141,13 @@ def main() -> None:
                 shutil.move(str(item), str(dest))
 
     shutil.rmtree(tmp_dir, ignore_errors=True)
+    logger.info("Done. Temporary download directory removed.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        logger.exception("Dataset download failed.")
+        raise SystemExit(1)
 
